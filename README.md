@@ -6,20 +6,20 @@
 
 ```
 SELECT
-    CONCAT(s.last_name, ' ', s.first_name) AS staff_name,
-    c.city,
-    COUNT(cu.customer_id) AS customer_count
-FROM store st
-JOIN staff s
-    ON st.manager_staff_id = s.staff_id
-JOIN address a
-    ON st.address_id = a.address_id
-JOIN city c
-    ON a.city_id = c.city_id
-JOIN customer cu
-    ON st.store_id = cu.store_id
-GROUP BY st.store_id
-HAVING COUNT(cu.customer_id) > 300;
+    CONCAT(staff.last_name, ' ', staff.first_name),
+    city.city,
+    COUNT(customer.customer_id)
+FROM store
+JOIN staff
+    ON store.manager_staff_id = staff.staff_id
+JOIN address
+    ON store.address_id = address.address_id
+JOIN city
+    ON address.city_id = city.city_id
+JOIN customer
+    ON store.store_id = customer.store_id
+GROUP BY store.store_id
+HAVING COUNT(customer.customer_id) > 300;
 ```
 
 
@@ -28,7 +28,7 @@ HAVING COUNT(cu.customer_id) > 300;
 Используем агрегатную функцию AVG() и подзапрос
 
 ```
-SELECT COUNT(*) AS film_count
+SELECT COUNT(*)
 FROM film
 WHERE length > (
     SELECT AVG(length)
@@ -42,16 +42,16 @@ WHERE length > (
 
 ```
 SELECT
-    YEAR(p.payment_date) AS payment_year,
-    MONTH(p.payment_date) AS payment_month,
-    SUM(p.amount) AS total_amount,
-    COUNT(DISTINCT r.rental_id) AS rental_count
-FROM payment p
-JOIN rental r
-    ON p.rental_id = r.rental_id
+    YEAR(payment.payment_date),
+    MONTH(payment.payment_date),
+    SUM(payment.amount),
+    COUNT(DISTINCT rental.rental_id)
+FROM payment
+JOIN rental
+    ON payment.rental_id = rental.rental_id
 GROUP BY
-    YEAR(p.payment_date),
-    MONTH(p.payment_date)
-ORDER BY total_amount DESC
+    YEAR(payment.payment_date),
+    MONTH(payment.payment_date)
+ORDER BY SUM(payment.amount) DESC
 LIMIT 1;
 ```
